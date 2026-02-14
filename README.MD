@@ -33,4 +33,4 @@ python main.py
 
 ## Лицензия
 
-MIT License
+Проект распространяется под лицензией [MIT License](./MIT_LICENSE).
