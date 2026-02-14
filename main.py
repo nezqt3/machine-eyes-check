@@ -1,21 +1,38 @@
 import cv2
-import numpy
 
-cam = cv2.VideoCapture(0)
-cam.set(3, 640)
-cam.set(3, 480)
-face_detector = cv2.CascadeClassifier('haarcascade_frontalface_alt_tree.xml')
+cap = cv2.VideoCapture(0)
+face_cascade = cv2.CascadeClassifier('./cascades/haarcascade_frontalface_default.xml')
 
-while (True):
-    ret, img = cam.read()
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = face_detector.detectMultiScale(gray, 1.3, 5)
+if not cap.isOpened():
+    print("Ошибка: Не удается открыть камеру")
+    exit()
 
-for (x, y, w, h) in faces:
-    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    count += 1
 
-    # Save the captured image into the datasets folder
-    cv2.imwrite("dataset/User." + str(face_id) + '.' + str(count) + ".jpg", gray[y:y + h, x:x + w])
+while True:
+    ret, frame = cap.read()
+    
+    if not ret:
+        print("Ошибка: Не удается получить кадр")
+        break
+    
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(
+        gray,
+        scaleFactor= 1.1,
+        minNeighbors= 5,
+        minSize=(1, 1)
+    )
 
-    cv2.imshow('image', img)
+    for (x, y, w, h) in faces:
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 255), 2)
+
+    if len(faces) >= 2:
+        print("Внимание! Несколько зрителей")
+
+    cv2.imshow('Камера', frame)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
